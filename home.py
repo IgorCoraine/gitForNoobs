@@ -36,7 +36,7 @@ class Home(tk.Frame):
             try:
                 repo_path = os.path.join(base_path, repo)
                 g = git.Repo(repo_path)
-                status = "OK" if g.is_dirty() else "NOK"
+                status = "✅" if g.is_dirty() else "🔄"
                 self.repo_listbox.insert(tk.END, f"{repo} - {status}")
             except Exception as e:
                 print(f"Erro ao acessar o repositório {repo}: {e}")
@@ -53,6 +53,7 @@ class Home(tk.Frame):
         # Fecha a janela de detalhes anterior, se existir
         if self.detalhes_window is not None:
             self.detalhes_window.destroy()
+            self.detalhes_window.close_history()
 
         # Cria uma nova janela de detalhes
         self.detalhes_window = Detalhes(self.master, repo_name)

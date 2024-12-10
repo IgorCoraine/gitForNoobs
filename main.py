@@ -5,7 +5,7 @@ class Application(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Git GUI App")
-        self.geometry("800x600")
+        self.geometry("1000x800")
         self.home_screen = Home(self)
         self.home_screen.pack(fill=tk.BOTH, expand=True)
 
