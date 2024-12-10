@@ -61,8 +61,48 @@ class Detalhes(tk.Frame):
             print(f"Erro ao carregar arquivos do repositório: {e}")
 
     def commit_changes(self):
-        # Lógica para fazer commit; você pode adicionar um popup para inserir mensagem e user.name.
-        pass
+        # Cria uma janela popup para inserir a mensagem de commit
+        commit_popup = tk.Toplevel(self.master)
+        commit_popup.title("Fazer Commit")
+
+        tk.Label(commit_popup, text="Mensagem do Commit:").pack()
+        message_entry = tk.Entry(commit_popup, width=50)
+        message_entry.pack()
+
+        tk.Label(commit_popup, text="Nome do Autor:").pack()
+        author_entry = tk.Entry(commit_popup, width=50)
+        author_entry.pack()
+
+        def perform_commit():
+            message = message_entry.get()
+            author_name = author_entry.get()
+
+            if not message:
+                messagebox.showwarning("Mensagem Vazia", "Por favor, insira uma mensagem de commit.")
+                return
+            if not author_name:
+                messagebox.showwarning("Autor Vazio", "Por favor, insira um nome para o commit.")
+                return
+
+            repo_path = os.path.join("/home/cora/Documentos/Dev", self.repo_name)  # Defina o caminho da pasta base aqui.
+            try:
+                g = git.Repo(repo_path)
+
+                # Adiciona todos os arquivos modificados ao índice
+                g.git.add(A=True)  # Adiciona todos os arquivos
+
+                # Realiza o commit
+                g.config_writer().set_value("user", "name", author_name).release()
+                g.index.commit(message)
+
+                messagebox.showinfo("Commit Realizado", "As alterações foram comitadas com sucesso.")
+                commit_popup.destroy()  # Fecha a janela popup após o commit
+            except Exception as e:
+                messagebox.showerror("Erro ao Fazer Commit", str(e))
+
+        commit_button = tk.Button(commit_popup, text="Commit", command=perform_commit)
+        commit_button.pack()
+
 
     def show_history(self):
         self.history_window = Historico(self.master, self.repo_name)
