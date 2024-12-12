@@ -36,10 +36,15 @@ class Home(tk.Frame):
             try:
                 repo_path = os.path.join(base_path, repo)
                 g = git.Repo(repo_path)
-                status = "✅" if g.is_dirty() else "🔄"
+                status = "🔄" if g.is_dirty() else "✅"
                 self.repo_listbox.insert(tk.END, f"{repo} - {status}")
             except Exception as e:
                 print(f"Erro ao acessar o repositório {repo}: {e}")
+
+    def update_status(self):
+        """Atualiza o status dos repositórios periodicamente."""
+        self.update_repo_list()  # Chama o método para atualizar a lista de repositórios
+        self.after(5000, self.update_status)  # Chama este método novamente após 5000 ms (5 segundos)
 
     def show_details(self):
         selected_repo_index = self.repo_listbox.curselection()

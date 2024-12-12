@@ -11,8 +11,20 @@ class Historico(tk.Frame):
         self.label = tk.Label(self, text=f"Histórico de Commits: {self.repo_name}")
         self.label.pack()
 
-        self.commit_listbox = tk.Listbox(self)
-        self.commit_listbox.pack(fill=tk.BOTH, expand=True)
+        # Criação do frame para o Listbox e a barra de rolagem
+        self.hist_frame = tk.Frame(self)
+        self.hist_frame.pack(fill=tk.BOTH, expand=True)
+
+        # Criação do Listbox
+        self.commit_listbox = tk.Listbox(self.hist_frame)
+        self.commit_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        # Criação da barra de rolagem
+        self.scrollbar = tk.Scrollbar(self.hist_frame, orient="vertical", command=self.commit_listbox.yview)
+        self.scrollbar.pack(side=tk.RIGHT, fill="y")
+
+        # Configura o Listbox para usar a barra de rolagem
+        self.commit_listbox.config(yscrollcommand=self.scrollbar.set)
 
         self.load_history()
 

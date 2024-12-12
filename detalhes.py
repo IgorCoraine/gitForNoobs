@@ -13,8 +13,20 @@ class Detalhes(tk.Frame):
         self.label = tk.Label(self, text=f"Detalhes do Repositório: {self.repo_name}")
         self.label.pack()
 
-        self.file_listbox = tk.Listbox(self)
-        self.file_listbox.pack(fill=tk.BOTH, expand=True)
+        # Criação do frame para o Listbox e a barra de rolagem
+        self.frame = tk.Frame(self)
+        self.frame.pack(fill=tk.BOTH, expand=True)
+
+        # Criação do Listbox
+        self.file_listbox = tk.Listbox(self.frame)
+        self.file_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        # Criação da barra de rolagem
+        self.scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.file_listbox.yview)
+        self.scrollbar.pack(side=tk.RIGHT, fill="y")
+
+        # Configura o Listbox para usar a barra de rolagem
+        self.file_listbox.config(yscrollcommand=self.scrollbar.set)
 
         self.commit_button = tk.Button(self, text="Fazer Commit", command=self.commit_changes)
         self.commit_button.pack()
@@ -23,6 +35,9 @@ class Detalhes(tk.Frame):
         self.history_button.pack()
 
         self.load_files()
+
+        # Variável para armazenar a referência da tela de detalhes
+        self.history_window = None
 
     def load_files(self):
         base_path = "/home/cora/Documentos/Dev"  # Defina o caminho da pasta base aqui.
@@ -35,9 +50,9 @@ class Detalhes(tk.Frame):
 
         try:
             g = git.Repo(repo_path)
-            # Lista todos os arquivos no diretório do repositório
-            all_files = os.listdir(repo_path)
+            all_files = os.listdir(repo_path)  # Lista todos os arquivos no diretório do repositório
             tracked_files = g.git.ls_files().splitlines()  # Arquivos rastreados
+            modified_files = g.index.diff(None)  # Arquivos modificados
 
             for file in all_files:
                 if file == ".git":  # Ignora a pasta .git
@@ -47,10 +62,10 @@ class Detalhes(tk.Frame):
                 if os.path.isfile(file_path):
                     if file in tracked_files:
                         # Verifica se o arquivo foi modificado ou não
-                        if g.is_dirty(untracked_files=True):
-                            status = "✅" if g.index.diff(file) else "🔄"
+                        if any(mod_file.a_path == file for mod_file in modified_files):
+                            status = "🔄"  # Arquivo modificad
                         else:
-                            status = "✅"
+                            status = "✅"  # Arquivo rastreado e não modificado
                     else:
                         status = "🔄"  # Arquivo não rastreado
 
@@ -105,10 +120,21 @@ class Detalhes(tk.Frame):
 
 
     def show_history(self):
+        # Fecha a janela de detalhes anterior, se existir
+        if self.history_window is not None:
+            self.history_window.destroy()
+
         self.history_window = Historico(self.master, self.repo_name)
         self.history_window.pack(fill=tk.BOTH, expand=True)
 
+        # Remove o botão de histórico
+        self.history_button.pack_forget() 
+
     def close_history(self):
         # Fecha a janela de histórico anterior, se existir
-        if self.history_window is not None:
-            self.history_window.destroy()
+        try:
+            if self.history_window is not None:
+                self.history_window.destroy()
+        except:
+            pass
+        
