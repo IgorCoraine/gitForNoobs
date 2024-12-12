@@ -3,6 +3,7 @@ import git
 import os
 from tkinter import messagebox
 from historico import Historico  # Importa a tela de histórico
+from config import Config
 
 class Detalhes(tk.Frame):
     def __init__(self, master, repo_name):
@@ -10,6 +11,12 @@ class Detalhes(tk.Frame):
         self.master = master
         self.repo_name = repo_name
         
+        # Carrega o caminho da pasta base
+        self.base_path = Config.load_base_path()
+        if not self.base_path:
+            messagebox.showerror("Erro", "Não foi possível carregar o caminho da pasta base.")
+            return
+
         self.label = tk.Label(self, text=f"Detalhes do Repositório: {self.repo_name}")
         self.label.pack()
 
@@ -40,8 +47,7 @@ class Detalhes(tk.Frame):
         self.history_window = None
 
     def load_files(self):
-        base_path = "/home/cora/Documentos/Dev"  # Defina o caminho da pasta base aqui.
-        repo_path = os.path.join(base_path, self.repo_name)
+        repo_path = os.path.join(self.base_path, self.repo_name)
 
         # Verifica se o caminho é um repositório Git
         if not os.path.exists(os.path.join(repo_path, '.git')):

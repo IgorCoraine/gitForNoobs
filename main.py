@@ -9,6 +9,7 @@ class Application(tk.Tk):
         self.home_screen = Home(self)
         self.home_screen.pack(fill=tk.BOTH, expand=True)
 
+
 if __name__ == "__main__":
     app = Application()
     app.mainloop()

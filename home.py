@@ -3,12 +3,27 @@ from tkinter import messagebox
 import os
 import git  # Importa a biblioteca GitPython
 from detalhes import Detalhes  # Importa a tela de detalhes
+from config import Config
 
 class Home(tk.Frame):
     def __init__(self, master):
         super().__init__(master)
         self.master = master
-        
+
+         # Carrega o caminho da pasta base
+        self.base_path = Config.load_base_path()
+        if not self.base_path:
+            messagebox.showerror("Erro", "Não foi possível carregar o caminho da pasta base.")
+            return
+
+        # Criação da barra superior
+        self.toolbar = tk.Frame(self)
+        self.toolbar.pack(side=tk.TOP, fill=tk.X)
+
+        # Botão de Configuração
+        self.config_button = tk.Button(self.toolbar, text="⚙️", command=self.show_config)
+        self.config_button.pack(side=tk.LEFT, padx=5, pady=5)  # Adiciona o botão à barra
+
         self.label = tk.Label(self, text="Repositórios:")
         self.label.pack()
 
@@ -27,14 +42,12 @@ class Home(tk.Frame):
         self.detalhes_window = None
 
     def update_repo_list(self):
-        # Aqui você deve listar os repositórios na pasta base (definida em config)
-        base_path = "/home/cora/Documentos/Dev"  # Defina o caminho da pasta base aqui.
-        repos = [d for d in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, d))]
+        repos = [d for d in os.listdir(self.base_path) if os.path.isdir(os.path.join(self.base_path, d))]
         
         self.repo_listbox.delete(0, tk.END)  # Limpa a lista antes de atualizar
         for repo in repos:
             try:
-                repo_path = os.path.join(base_path, repo)
+                repo_path = os.path.join(self.base_path, repo)
                 g = git.Repo(repo_path)
                 status = "🔄" if g.is_dirty() else "✅"
                 self.repo_listbox.insert(tk.END, f"{repo} - {status}")
@@ -68,3 +81,9 @@ class Home(tk.Frame):
         # Função para adicionar um novo repositório
         new_repo_name = "novo_repositorio"  # Aqui você deve implementar a lógica para criar um novo repositório.
         messagebox.showinfo("Adicionar Repositório", f"Repositório '{new_repo_name}' criado com sucesso!")
+
+    def show_config(self):
+        config_window = Config(self.master)
+        config_window.pack(fill=tk.BOTH, expand=True)
+
+
