@@ -1,6 +1,7 @@
 import tkinter as tk
 import git
 import os
+import subprocess
 from tkinter import messagebox
 from historico import Historico  # Importa a tela de histórico
 from config import Config
@@ -39,11 +40,19 @@ class Detalhes(tk.Frame):
         # Configura o Listbox para usar a barra de rolagem
         self.file_listbox.config(yscrollcommand=self.scrollbar.set)
 
-        self.commit_button = tk.Button(self, text="Fazer Commit", command=self.commit_changes)
-        self.commit_button.pack()
+        # Frame para os botões
+        self.button_frame = tk.Frame(self)
+        self.button_frame.pack(pady=10)
 
-        self.history_button = tk.Button(self, text="Ver Histórico", command=self.show_history)
-        self.history_button.pack()
+        self.commit_button = tk.Button(self.button_frame, text="Fazer Commit", command=self.commit_changes)
+        self.commit_button.pack(side=tk.LEFT, padx=10)
+
+        self.history_button = tk.Button(self.button_frame, text="Ver Histórico", command=self.show_history)
+        self.history_button.pack(side=tk.LEFT, padx=10)
+
+        # Botão para abrir o diretório do repositório
+        self.open_directory_button = tk.Button(self.button_frame, text="Abrir Diretório", command=self.open_directory)
+        self.open_directory_button.pack(side=tk.LEFT, padx=10)
 
         self.load_files()
 
@@ -170,4 +179,13 @@ class Detalhes(tk.Frame):
                 self.history_window.destroy()
         except:
             pass
+
+    def open_directory(self):
+        """Abre o diretório do repositório no gerenciador de arquivos."""
+        repo_path = os.path.join(self.base_path, self.repo_name)
+        
+        if os.name == 'nt':  # Windows
+            os.startfile(repo_path)
+        elif os.name == 'posix':  # Linux ou MacOS
+            subprocess.Popen(['xdg-open', repo_path])  # Para Linux (usando xdg-open)
         

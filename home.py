@@ -45,11 +45,15 @@ class Home(tk.Frame):
         # Configura o Listbox para usar a barra de rolagem
         self.repo_listbox.config(yscrollcommand=self.scrollbar.set)
 
-        self.details_button = tk.Button(self, text="Ver Detalhes", command=self.show_details)
-        self.details_button.pack()
+        # Frame para os botões
+        self.button_frame = tk.Frame(self)
+        self.button_frame.pack(pady=10)
 
-        self.add_repo_button = tk.Button(self, text="Adicionar Repositório", command=self.add_repository)
-        self.add_repo_button.pack()
+        self.details_button = tk.Button(self.button_frame, text="Ver Detalhes", command=self.show_details)
+        self.details_button.pack(side=tk.LEFT, padx=10)
+
+        self.add_repo_button = tk.Button(self.button_frame, text="Adicionar Repositório", command=self.add_repository)
+        self.add_repo_button.pack(side=tk.LEFT, padx=10)
 
         self.update_repo_list()
 

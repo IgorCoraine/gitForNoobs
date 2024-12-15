@@ -20,13 +20,17 @@ class Config(tk.Frame):
         self.path_entry = tk.Entry(self, width=50)
         self.path_entry.pack(pady=5)
 
+        # Frame para os botões
+        self.button_frame = tk.Frame(self)
+        self.button_frame.pack(pady=10)
+
         # Botão para salvar as configurações
-        self.save_button = tk.Button(self, text="Salvar", command=self.save_config)
-        self.save_button.pack()
+        self.save_button = tk.Button(self.button_frame, text="Salvar", command=self.save_config)
+        self.save_button.pack(side=tk.LEFT, padx=10)
 
         # Botão para fechar as configurações
-        self.close_button = tk.Button(self, text="Cancelar", command=self.close_window)
-        self.close_button.pack()
+        self.close_button = tk.Button(self.button_frame, text="Cancelar", command=self.close_window)
+        self.close_button.pack(side=tk.LEFT, padx=10)
 
         # Carrega o caminho atual da pasta base ao inicializar
         self.load_current_path()
