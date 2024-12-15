@@ -10,6 +10,10 @@ class Detalhes(tk.Frame):
         super().__init__(master)
         self.master = master
         self.repo_name = repo_name
+
+        # Barra de divisão
+        self.divider = tk.Frame(self, height=4, bg="black")
+        self.divider.pack(fill=tk.X, pady=10)
         
         # Carrega o caminho da pasta base
         self.base_path = Config.load_base_path()
@@ -51,9 +55,22 @@ class Detalhes(tk.Frame):
 
         # Verifica se o caminho é um repositório Git
         if not os.path.exists(os.path.join(repo_path, '.git')):
-            messagebox.showwarning("Não é um repositório Git", f"A pasta '{self.repo_name}' não é um repositório Git.\nDeseja inicializar um novo repositório?")
-            return  # Retorna se não for um repositório Git
+            # Cria uma janela popup para perguntar se deseja criar um repositório no diretório existente
+            self.add_repo_popup = tk.Toplevel(self.master)
+            self.add_repo_popup.title("Não é um repositório Git")
 
+            # Texto informativo
+            message_label = tk.Label(self.add_repo_popup, text=f"A pasta '{self.repo_name}' não é um repositório Git.\nDeseja inicializar um novo repositório?")
+            message_label.pack(pady=10)
+
+            # Botão para criar o repositório
+            create_button = tk.Button(self.add_repo_popup, text="Inicializar Repositório", command=lambda: self.create_repository(repo_path))
+            create_button.pack(side=tk.LEFT, pady=10, padx=10)
+
+            # Botão para não criar o repositório
+            cancel_button = tk.Button(self.add_repo_popup, text="Cancelar", command=self.add_repo_popup.destroy)
+            cancel_button.pack(side=tk.RIGHT, pady=10, padx=10)
+            
         try:
             g = git.Repo(repo_path)
             all_files = os.listdir(repo_path)  # Lista todos os arquivos no diretório do repositório
@@ -79,7 +96,17 @@ class Detalhes(tk.Frame):
                     self.file_listbox.insert(tk.END, status_text)
 
         except Exception as e:
+            self.config_window.close_window()
             print(f"Erro ao carregar arquivos do repositório: {e}")
+
+    def create_repository(self, repo_path):
+        """Cria um novo repositório Git no caminho especificado."""
+        try:
+            git.Repo.init(repo_path)  # Inicializa o repositório Git
+            messagebox.showinfo("Repositório Criado", f"Repositório '{self.repo_name}' criado com sucesso!")
+            self.add_repo_popup.destroy()  # Fecha a janela popup após criar o repositório
+        except Exception as e:
+            messagebox.showerror("Erro ao Criar Repositório", str(e))
 
     def commit_changes(self):
         # Cria uma janela popup para inserir a mensagem de commit

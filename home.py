@@ -30,8 +30,20 @@ class Home(tk.Frame):
         self.label = tk.Label(self, text="Repositórios:")
         self.label.pack()
 
-        self.repo_listbox = tk.Listbox(self)
-        self.repo_listbox.pack(fill=tk.BOTH, expand=True)
+        # Criação do frame para o Listbox e a barra de rolagem
+        self.frame = tk.Frame(self)
+        self.frame.pack(fill=tk.BOTH, expand=True)
+
+        # Criação do Listbox
+        self.repo_listbox = tk.Listbox(self.frame)
+        self.repo_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        # Criação da barra de rolagem
+        self.scrollbar = tk.Scrollbar(self.frame, orient="vertical", command=self.repo_listbox.yview)
+        self.scrollbar.pack(side=tk.RIGHT, fill="y")
+
+        # Configura o Listbox para usar a barra de rolagem
+        self.repo_listbox.config(yscrollcommand=self.scrollbar.set)
 
         self.details_button = tk.Button(self, text="Ver Detalhes", command=self.show_details)
         self.details_button.pack()
@@ -90,9 +102,49 @@ class Home(tk.Frame):
         self.detalhes_window.pack(fill=tk.BOTH, expand=True)
 
     def add_repository(self):
-        # Função para adicionar um novo repositório
-        new_repo_name = "novo_repositorio"  # Aqui você deve implementar a lógica para criar um novo repositório.
-        messagebox.showinfo("Adicionar Repositório", f"Repositório '{new_repo_name}' criado com sucesso!")
+        """Adiciona um novo repositório à pasta base."""
+        # Cria uma janela popup para inserir o nome do novo repositório
+        self.add_repo_popup = tk.Toplevel(self.master)
+        self.add_repo_popup.title("Adicionar Repositório")
+
+        tk.Label(self.add_repo_popup, text="Nome do Repositório:").pack(pady=5)
+        self.repo_name_entry = tk.Entry(self.add_repo_popup, width=50)
+        self.repo_name_entry.pack(pady=5)
+
+        create_button = tk.Button(self.add_repo_popup, text="Criar Repositório", command=self.create_repository)
+        create_button.pack(pady=10)
+
+    def create_repository(self):
+        repo_name = self.repo_name_entry.get().strip()
+        if not repo_name:
+            messagebox.showwarning("Nome Inválido", "Por favor, insira um nome para o repositório.")
+            return
+
+        base_path = Config.load_base_path()  # Carrega o caminho da pasta base
+        if not base_path:
+            messagebox.showerror("Erro", "Caminho da pasta base não encontrado.")
+            return
+
+        repo_path = os.path.join(base_path, repo_name)
+
+        # Verifica se o repositório já existe
+        if os.path.exists(repo_path):
+            messagebox.showwarning("Repositório Já Existe", f"O repositório '{repo_name}' já existe.")
+            return
+
+        try:
+            # Cria o diretório do novo repositório
+            os.makedirs(repo_path)
+            # Inicializa o repositório Git
+            g = git.Repo.init(repo_path)
+
+            messagebox.showinfo("Repositório Criado", f"Repositório '{repo_name}' criado com sucesso!")
+            self.add_repo_popup.destroy()  # Fecha a janela popup após criar o repositório
+            self.update_repo_list()  # Atualiza a lista de repositórios
+
+        except Exception as e:
+            messagebox.showerror("Erro ao Criar Repositório", str(e))
+
 
     def show_config(self):
         if self.detalhes_window is not None:

@@ -6,6 +6,10 @@ class Config(tk.Frame):
     def __init__(self, master):
         super().__init__(master)
         self.master = master
+
+        # Barra de divisão
+        self.divider = tk.Frame(self, height=4, bg="black")
+        self.divider.pack(fill=tk.X, pady=10)
         
         self.label = tk.Label(self, text="Configurações do Caminho da Pasta Base")
         self.label.pack(pady=10)

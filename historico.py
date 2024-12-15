@@ -10,6 +10,10 @@ class Historico(tk.Frame):
         self.master = master
         self.repo_name = repo_name
 
+        # Barra de divisão
+        self.divider = tk.Frame(self, height=4, bg="black")
+        self.divider.pack(fill=tk.X, pady=10)
+
         # Carrega o caminho da pasta base
         self.base_path = Config.load_base_path()
         if not self.base_path:
