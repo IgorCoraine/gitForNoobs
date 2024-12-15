@@ -23,6 +23,9 @@ class Home(tk.Frame):
         # Botão de Configuração
         self.config_button = tk.Button(self.toolbar, text="⚙️", command=self.show_config)
         self.config_button.pack(side=tk.LEFT, padx=5, pady=5)  # Adiciona o botão à barra
+        #Botão de Atualizar página
+        self.reload_button = tk.Button(self.toolbar, text="↻", command=self.update_repo_list)
+        self.reload_button.pack(side=tk.LEFT, padx=5, pady=5)
 
         self.label = tk.Label(self, text="Repositórios:")
         self.label.pack()
@@ -40,8 +43,14 @@ class Home(tk.Frame):
 
         # Variável para armazenar a referência da tela de detalhes
         self.detalhes_window = None
+        self.config_window = None
 
     def update_repo_list(self):
+        self.base_path = Config.load_base_path()
+        if not self.base_path:
+            messagebox.showerror("Erro", "Não foi possível carregar o caminho da pasta base.")
+            return
+        
         repos = [d for d in os.listdir(self.base_path) if os.path.isdir(os.path.join(self.base_path, d))]
         
         self.repo_listbox.delete(0, tk.END)  # Limpa a lista antes de atualizar
@@ -52,7 +61,8 @@ class Home(tk.Frame):
                 status = "🔄" if g.is_dirty() else "✅"
                 self.repo_listbox.insert(tk.END, f"{repo} - {status}")
             except Exception as e:
-                print(f"Erro ao acessar o repositório {repo}: {e}")
+                status = "❌"
+                self.repo_listbox.insert(tk.END, f"{repo} - {status}")
 
     def update_status(self):
         """Atualiza o status dos repositórios periodicamente."""
@@ -60,6 +70,8 @@ class Home(tk.Frame):
         self.after(5000, self.update_status)  # Chama este método novamente após 5000 ms (5 segundos)
 
     def show_details(self):
+        if self.config_window is not None:
+            self.config_window.close_window()
         selected_repo_index = self.repo_listbox.curselection()
         if not selected_repo_index:
             messagebox.showwarning("Seleção Inválida", "Por favor, selecione um repositório.")
@@ -83,7 +95,9 @@ class Home(tk.Frame):
         messagebox.showinfo("Adicionar Repositório", f"Repositório '{new_repo_name}' criado com sucesso!")
 
     def show_config(self):
-        config_window = Config(self.master)
-        config_window.pack(fill=tk.BOTH, expand=True)
-
+        if self.detalhes_window is not None:
+            self.detalhes_window.destroy()
+            self.detalhes_window.close_history()
+        self.config_window = Config(self.master)
+        self.config_window.pack(fill=tk.BOTH, expand=True)
 

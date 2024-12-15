@@ -18,31 +18,74 @@ class Config(tk.Frame):
 
         # Botão para salvar as configurações
         self.save_button = tk.Button(self, text="Salvar", command=self.save_config)
-        self.save_button.pack(pady=10)
+        self.save_button.pack()
+
+        # Botão para fechar as configurações
+        self.close_button = tk.Button(self, text="Cancelar", command=self.close_window)
+        self.close_button.pack()
 
         # Carrega o caminho atual da pasta base ao inicializar
         self.load_current_path()
 
     def load_current_path(self):
         """Carrega o caminho da pasta base a partir do arquivo de configuração e exibe no Entry."""
+        if not os.path.exists("config.txt"):
+            # Se o arquivo não existir, cria com um caminho padrão
+            default_path = os.path.abspath(os.sep)  # Raiz do sistema (C:\ ou /)
+            with open("config.txt", "w") as config_file:
+                config_file.write(f"path={default_path}\n")  # Cria o arquivo com o caminho padrão
+                print("Arquivo de configuração criado com o caminho padrão.")
+        
         try:
             with open("config.txt", "r") as config_file:
-                base_path = config_file.read().strip()
-                self.path_entry.insert(0, base_path)  # Insere o caminho no Entry
-        except FileNotFoundError:
-            print("Arquivo de configuração não encontrado.")
-            # Se o arquivo não existir, podemos deixar o campo vazio ou definir um valor padrão
+                found_path = False
+                for line in config_file:
+                    if line.startswith("path="):
+                        base_path = line.split("=")[1].strip()
+                        self.path_entry.insert(0, base_path)  # Insere o caminho no Entry
+                        found_path = True
+                        break
+                
+                if not found_path:
+                    # Se não encontrar 'path=', adiciona com um caminho padrão
+                    default_path = os.path.abspath(os.sep)
+                    with open("config.txt", "a") as config_file:
+                        config_file.write(f"path={default_path}\n")
+                    self.path_entry.insert(0, default_path)  # Insere o caminho padrão no Entry
+                    print("Caminho padrão adicionado ao arquivo de configuração.")
+
+        except Exception as e:
+            print(f"Erro ao ler o arquivo de configuração: {e}")
             self.path_entry.delete(0, tk.END)  # Limpa o campo de entrada
 
     @staticmethod
     def load_base_path():
         """Carrega o caminho da pasta base a partir do arquivo de configuração."""
         try:
+            if not os.path.exists("config.txt"):
+                # Se o arquivo não existir, cria com um caminho padrão
+                default_path = os.path.abspath(os.sep)  # Raiz do sistema (C:\ ou /)
+                with open("config.txt", "w") as config_file:
+                    config_file.write(f"path={default_path}\n")  # Cria o arquivo com o caminho padrão
+                    print("Arquivo de configuração criado com o caminho padrão.")
+            
             with open("config.txt", "r") as config_file:
-                base_path = config_file.read().strip()
-                return base_path
-        except FileNotFoundError:
-            print("Arquivo de configuração não encontrado.")
+                found_path = False
+                for line in config_file:
+                    if line.startswith("path="):
+                        return line.split("=")[1].strip()
+                
+                if not found_path:
+                    # Se não encontrar 'path=', adiciona com um caminho padrão
+                    default_path = os.path.abspath(os.sep)
+                    with open("config.txt", "a") as config_file:
+                        config_file.write(f"path={default_path}\n")
+                    return default_path
+
+            return None
+
+        except Exception as e:
+            print(f"Erro ao ler o arquivo de configuração: {e}")
             return None
 
     def save_config(self):
@@ -54,6 +97,11 @@ class Config(tk.Frame):
             return
 
         with open("config.txt", "w") as config_file:
-            config_file.write(base_path)  # Salva o caminho no arquivo
+            config_file.write(f"path={base_path}\n")  # Salva o caminho no formato key=value
 
         messagebox.showinfo("Configuração Salva", "O caminho da pasta base foi salvo com sucesso!")
+        self.close_window()
+
+    def close_window(self):
+        """Fecha a janela de configurações."""
+        self.destroy()

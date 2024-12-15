@@ -1,1 +1,1 @@
-/home/cora/Documentos/Dev
+path=/home/cora/Documentos/Dev
