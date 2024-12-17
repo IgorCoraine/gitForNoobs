@@ -38,6 +38,10 @@ class Historico(tk.Frame):
         # Configura o Listbox para usar a barra de rolagem
         self.commit_listbox.config(yscrollcommand=self.scrollbar.set)
 
+        # Botão para restaurar o commit selecionado
+        self.restore_button = tk.Button(self, text="Restaurar Estado", command=self.restore_commit)
+        self.restore_button.pack(pady=10)
+
         self.load_history()
 
     def load_history(self):
@@ -53,3 +57,35 @@ class Historico(tk.Frame):
 
         except Exception as e:
             print(f"Erro ao carregar histórico de commits: {e}")
+
+    def restore_commit(self):
+        """Restaura o estado do commit selecionado."""
+        selected_index = self.commit_listbox.curselection()
+        
+        if not selected_index:
+            messagebox.showwarning("Seleção Inválida", "Por favor, selecione um commit para ser restaurado.")
+            return
+
+        selected_commit = self.commit_listbox.get(selected_index)
+        commit_id = selected_commit.split(" - ")[0]  # Pega apenas o ID do commit
+
+        # Define o caminho para clonar o repositório
+        base_path = Config.load_base_path()
+        new_repo_name = f"{self.repo_name}_{commit_id}"
+        new_repo_path = os.path.join(base_path, new_repo_name)
+
+        try:
+            # Clona o repositório original
+            original_repo_path = os.path.join(base_path, self.repo_name)
+            g_original = git.Repo(original_repo_path)
+
+            # Clona o repositório na nova pasta
+            g_clone = g_original.clone(new_repo_path)
+
+            # Faz checkout do commit específico
+            g_clone.git.checkout(commit_id)
+
+            messagebox.showinfo("Estado Restaurado", f"Commit '{commit_id}' restaurado com sucesso em '{new_repo_path}'.")
+        except Exception as e:
+            messagebox.showerror("Erro ao Restaurar Commit", str(e))
+
