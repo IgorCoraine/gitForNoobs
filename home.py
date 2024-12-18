@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 import os
 import git  # Importa a biblioteca GitPython
+from PIL import Image, ImageTk  # Importa Image e ImageTk da biblioteca Pillow
 from detalhes import Detalhes  # Importa a tela de detalhes
 from config import Config
 
@@ -26,6 +27,9 @@ class Home(tk.Frame):
         #Botão de Atualizar página
         self.reload_button = tk.Button(self.toolbar, text="↻", command=self.update_repo_list)
         self.reload_button.pack(side=tk.LEFT, padx=5, pady=5)
+        #Botão de Sobre
+        self.reload_button = tk.Button(self.toolbar, text="Sobre", command=self.about)
+        self.reload_button.pack(side=tk.RIGHT, padx=5, pady=5)
 
         self.label = tk.Label(self, text="Repositórios:")
         self.label.pack()
@@ -157,3 +161,33 @@ class Home(tk.Frame):
         self.config_window = Config(self.master)
         self.config_window.pack(fill=tk.BOTH, expand=True)
 
+    def about(self):
+        # Cria uma janela popup para colocar as informações do aplicativo
+        self.about_popup = tk.Toplevel(self.master)
+        self.about_popup.title("Sobre | Git For Noobs")
+
+        # Define o tamanho da janela
+        self.about_popup.geometry("350x300")  # Ajuste o tamanho conforme necessário
+
+        # Adiciona labels com informações do aplicativo
+        tk.Label(self.about_popup, text="Git For Noobs", font=("Arial", 16, "bold")).pack(pady=5, padx=10)
+
+        tk.Label(self.about_popup, text="Version 1.0.0").pack(pady=5, padx=10)
+
+        tk.Label(self.about_popup, text="Created by igor.coraine.github.io").pack(pady=5, padx=10)
+
+        tk.Label(self.about_popup, text="This application is licensed under the MIT License.").pack(pady=5, padx=10)
+        
+        tk.Label(self.about_popup, text="Copyright (c) [2024] [Igor Coraine]").pack(pady=5, padx=10)
+
+        # Carrega a imagem
+        image_path = "/home/cora/Documentos/Dev/gitForNoobs/icon.png"  # Substitua pelo caminho da sua imagem
+        try:
+            original_image = Image.open(image_path)  # Abre a imagem original
+            resized_image = original_image.resize((150, 150), Image.LANCZOS)  # Redimensiona a imagem (largura x altura)
+            self.image = ImageTk.PhotoImage(resized_image)  # Converte para PhotoImage
+
+            image_label = tk.Label(self.about_popup, image=self.image)  # Cria um label para a imagem
+            image_label.pack()  # Adiciona o label da imagem ao popup
+        except Exception as e:
+            messagebox.showerror("Erro ao Carregar Imagem", str(e))
