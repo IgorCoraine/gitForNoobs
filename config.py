@@ -182,6 +182,8 @@ class Config(tk.Frame):
     @staticmethod
     def load_base_path():
         """Carrega o caminho da pasta base a partir do arquivo de configuração."""
+        default_password = "gitfornoobs"
+        hashed_password = hashlib.sha256(default_password.encode()).hexdigest()
         try:
             if not os.path.exists("config.txt"):
                 # Se o arquivo não existir, cria com um caminho padrão
@@ -189,6 +191,8 @@ class Config(tk.Frame):
                 with open("config.txt", "w") as config_file:
                     config_file.write(f"path={default_path}\n")  # Cria o arquivo com o caminho padrão
                     print("Arquivo de configuração criado com o caminho padrão.")
+                    config_file.write(f"password={hashed_password}\n") #Cria o arquivo com a senha padrão
+                    print("Arquivo de configuração criado com a senha padrão.")
             
             with open("config.txt", "r") as config_file:
                 for line in config_file:
