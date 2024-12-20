@@ -1,2 +1,1 @@
-path=/
-password=e545a9f7222679134b903e69b33d17703fb73eaca18f3f9fc24789b94a06ac87
+path=/Users/winti/Documents

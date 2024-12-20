@@ -78,7 +78,7 @@ class Home(tk.Frame):
             try:
                 repo_path = os.path.join(self.base_path, repo)
                 g = git.Repo(repo_path)
-                status = "🔄" if g.is_dirty() else "✅"
+                status = "⇄" if g.is_dirty() else "✅"
                 self.repo_listbox.insert(tk.END, f"{repo} - {status}")
             except Exception as e:
                 status = "❌"
@@ -181,7 +181,7 @@ class Home(tk.Frame):
         tk.Label(self.about_popup, text="Copyright (c) [2024] [Igor Coraine]").pack(pady=5, padx=10)
 
         # Carrega a imagem
-        image_path = "/home/cora/Documentos/Dev/gitForNoobs/icon.png"  # Substitua pelo caminho da sua imagem
+        image_path = "./icon.png"  
         try:
             original_image = Image.open(image_path)  # Abre a imagem original
             resized_image = original_image.resize((150, 150), Image.LANCZOS)  # Redimensiona a imagem (largura x altura)

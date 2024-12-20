@@ -95,11 +95,11 @@ class Detalhes(tk.Frame):
                     if file in tracked_files:
                         # Verifica se o arquivo foi modificado ou não
                         if any(mod_file.a_path == file for mod_file in modified_files):
-                            status = "🔄"  # Arquivo modificad
+                            status = "⇄"  # Arquivo modificad
                         else:
                             status = "✅"  # Arquivo rastreado e não modificado
                     else:
-                        status = "🔄"  # Arquivo não rastreado
+                        status = "⇄"  # Arquivo não rastreado
 
                     status_text = f"{file} - {status}"
                     self.file_listbox.insert(tk.END, status_text)
@@ -141,7 +141,7 @@ class Detalhes(tk.Frame):
                 messagebox.showwarning("Autor Vazio", "Por favor, insira um nome para o commit.")
                 return
 
-            repo_path = os.path.join("/home/cora/Documentos/Dev", self.repo_name)  # Defina o caminho da pasta base aqui.
+            repo_path = os.path.join(self.base_path, self.repo_name)  # Defina o caminho da pasta base aqui.
             try:
                 g = git.Repo(repo_path)
 
