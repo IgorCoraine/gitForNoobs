@@ -206,17 +206,36 @@ class Config(tk.Frame):
             return None
 
     def save_config(self):
-        """Salva o caminho da pasta base em um arquivo de configuração."""
+        """Salva o caminho da pasta base em um arquivo de configuração, mantendo a senha."""
         base_path = self.path_entry.get().strip()
-        
         if not os.path.isdir(base_path):
             messagebox.showwarning("Caminho Inválido", "Por favor, insira um caminho válido para a pasta base.")
             return
 
+        # Lê o conteúdo atual do arquivo
+        lines = []
+        if os.path.exists("config.txt"):
+            with open("config.txt", "r") as config_file:
+                lines = config_file.readlines()
+
+        # Atualiza ou adiciona a linha do caminho
+        found_path = False
+        for i in range(len(lines)):
+            if lines[i].startswith("path="):
+                lines[i] = f"path={base_path}\n"  # Atualiza a linha com o novo caminho
+                found_path = True
+                break
+
+        if not found_path:
+            # Se não encontrar 'path=', adiciona com um novo caminho
+            lines.append(f"path={base_path}\n")
+
+        # Grava tudo de volta no arquivo
         with open("config.txt", "w") as config_file:
-            config_file.write(f"path={base_path}\n")  # Salva o caminho no formato key=value
+            config_file.writelines(lines)
 
         messagebox.showinfo("Configuração Salva", "O caminho da pasta base foi salvo com sucesso!")
+
         
     def close_window(self):
         """Fecha a janela de configurações."""
