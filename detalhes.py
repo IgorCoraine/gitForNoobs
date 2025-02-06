@@ -79,33 +79,44 @@ class Detalhes(tk.Frame):
             # Botão para não criar o repositório
             cancel_button = tk.Button(self.add_repo_popup, text="Cancelar", command=self.add_repo_popup.destroy)
             cancel_button.pack(side=tk.RIGHT, pady=10, padx=10)
-            
+            return  # Exit the method if it's not a Git repository
+
         try:
             g = git.Repo(repo_path)
-            all_files = os.listdir(repo_path)  # Lista todos os arquivos no diretório do repositório
             tracked_files = g.git.ls_files().splitlines()  # Arquivos rastreados
             modified_files = g.index.diff(None)  # Arquivos modificados
 
-            for file in all_files:
-                if file == ".git":  # Ignora a pasta .git
-                    continue
-                
-                file_path = os.path.join(repo_path, file)
-                if os.path.isfile(file_path):
-                    if file in tracked_files:
-                        # Verifica se o arquivo foi modificado ou não
-                        if any(mod_file.a_path == file for mod_file in modified_files):
-                            status = "⇄"  # Arquivo modificad
-                        else:
-                            status = "✅"  # Arquivo rastreado e não modificado
-                    else:
-                        status = "⇄"  # Arquivo não rastreado
+            # Função recursiva para listar arquivos e diretórios
+            def list_files_recursively(directory, prefix=""):
+                for item in os.listdir(directory):
+                    if item == ".git":  # Ignora a pasta .git
+                        continue
 
-                    status_text = f"{file} - {status}"
-                    self.file_listbox.insert(tk.END, status_text)
+                    item_path = os.path.join(directory, item)
+                    display_path = os.path.join(prefix, item)
+
+                    if os.path.isdir(item_path):
+                        # Adiciona o diretório ao Listbox
+                        self.file_listbox.insert(tk.END, f"{display_path} 📁")
+                        # Recursivamente lista os arquivos dentro do diretório
+                        list_files_recursively(item_path, display_path)
+                    else:
+                        # Verifica o status do arquivo
+                        if item in tracked_files:
+                            if any(mod_file.a_path == item for mod_file in modified_files):
+                                status = "⇄"  # Arquivo modificado
+                            else:
+                                status = "✅"  # Arquivo rastreado e não modificado
+                        else:
+                            status = "⇄"  # Arquivo não rastreado
+
+                        # Adiciona o arquivo ao Listbox
+                        self.file_listbox.insert(tk.END, f"{display_path} - {status}")
+
+            # Inicia a listagem recursiva a partir do diretório raiz do repositório
+            list_files_recursively(repo_path)
 
         except Exception as e:
-            self.config_window.close_window()
             print(f"Erro ao carregar arquivos do repositório: {e}")
 
     def create_repository(self, repo_path):
