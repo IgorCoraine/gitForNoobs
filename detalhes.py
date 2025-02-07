@@ -79,12 +79,12 @@ class Detalhes(tk.Frame):
             # Botão para não criar o repositório
             cancel_button = tk.Button(self.add_repo_popup, text="Cancelar", command=self.add_repo_popup.destroy)
             cancel_button.pack(side=tk.RIGHT, pady=10, padx=10)
-            return  # Exit the method if it's not a Git repository
+            return  # Sai do método se não for um repositório Git
 
         try:
             g = git.Repo(repo_path)
-            tracked_files = g.git.ls_files().splitlines()  # Arquivos rastreados
-            modified_files = g.index.diff(None)  # Arquivos modificados
+            tracked_files = set(g.git.ls_files().splitlines())  # Converte para um conjunto para verificação rápida
+            modified_files = {diff.a_path for diff in g.index.diff(None)}  # Caminhos dos arquivos modificados
 
             # Função recursiva para listar arquivos e diretórios
             def list_files_recursively(directory, prefix=""):
@@ -102,8 +102,9 @@ class Detalhes(tk.Frame):
                         list_files_recursively(item_path, display_path)
                     else:
                         # Verifica o status do arquivo
-                        if item in tracked_files:
-                            if any(mod_file.a_path == item for mod_file in modified_files):
+                        relative_path = os.path.relpath(item_path, repo_path)  # Caminho relativo ao repositório
+                        if relative_path in tracked_files:
+                            if relative_path in modified_files:
                                 status = "⇄"  # Arquivo modificado
                             else:
                                 status = "✅"  # Arquivo rastreado e não modificado
@@ -118,6 +119,7 @@ class Detalhes(tk.Frame):
 
         except Exception as e:
             print(f"Erro ao carregar arquivos do repositório: {e}")
+
 
     def create_repository(self, repo_path):
         """Cria um novo repositório Git no caminho especificado."""
@@ -165,6 +167,7 @@ class Detalhes(tk.Frame):
 
                 messagebox.showinfo("Commit Realizado", "As alterações foram comitadas com sucesso.")
                 commit_popup.destroy()  # Fecha a janela popup após o commit
+                
             except Exception as e:
                 messagebox.showerror("Erro ao Fazer Commit", str(e))
 
