@@ -167,7 +167,7 @@ class Home(tk.Frame):
         self.about_popup.title("Sobre | Git For Noobs")
 
         # Define o tamanho da janela
-        self.about_popup.geometry("350x300")  # Ajuste o tamanho conforme necessário
+        self.about_popup.geometry("450x300")  # Ajuste o tamanho conforme necessário
 
         # Adiciona labels com informações do aplicativo
         tk.Label(self.about_popup, text="Git For Noobs", font=("Arial", 16, "bold")).pack(pady=5, padx=10)
@@ -176,9 +176,9 @@ class Home(tk.Frame):
 
         tk.Label(self.about_popup, text="Created by igor.coraine.github.io").pack(pady=5, padx=10)
 
-        tk.Label(self.about_popup, text="This application is licensed under the MIT License.").pack(pady=5, padx=10)
+        tk.Label(self.about_popup, text="This application is licensed under the GPL-3.0 License.").pack(pady=5, padx=10)
         
-        tk.Label(self.about_popup, text="Copyright (c) [2024] [Igor Coraine]").pack(pady=5, padx=10)
+        tk.Label(self.about_popup, text="Source available at https://github.com/IgorCoraine/gitForNoobs").pack(pady=5, padx=10)
 
         # Carrega a imagem
         image_path = "./icon.png"  
