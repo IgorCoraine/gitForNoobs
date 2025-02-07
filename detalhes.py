@@ -97,7 +97,7 @@ class Detalhes(tk.Frame):
 
                     if os.path.isdir(item_path):
                         # Adiciona o diretório ao Listbox
-                        self.file_listbox.insert(tk.END, f"{display_path} 📁")
+                        self.file_listbox.insert(tk.END, f"{display_path} [ ]")
                         # Recursivamente lista os arquivos dentro do diretório
                         list_files_recursively(item_path, display_path)
                     else:
