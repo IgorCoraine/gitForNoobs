@@ -84,7 +84,13 @@ class Detalhes(tk.Frame):
         try:
             g = git.Repo(repo_path)
             tracked_files = set(g.git.ls_files().splitlines())  # Converte para um conjunto para verificação rápida
+            tracked_files = {os.path.normpath(file) for file in tracked_files}  # Normaliza os caminhos dos arquivos    
             modified_files = {diff.a_path for diff in g.index.diff(None)}  # Caminhos dos arquivos modificados
+            modified_files = {os.path.normpath(file) for file in modified_files}  # Normaliza os caminhos dos arquivos
+            print("Arquivos rastreados:")
+            print(tracked_files)
+            print("Arquivos modificados:")
+            print(modified_files)
 
             # Função recursiva para listar arquivos e diretórios
             def list_files_recursively(directory, prefix=""):
@@ -103,6 +109,8 @@ class Detalhes(tk.Frame):
                     else:
                         # Verifica o status do arquivo
                         relative_path = os.path.relpath(item_path, repo_path)  # Caminho relativo ao repositório
+                        relative_path = os.path.normpath(relative_path)  # Normaliza o caminho
+                        print(f"Verificando arquivo: {relative_path}")
                         if relative_path in tracked_files:
                             if relative_path in modified_files:
                                 status = "⇄"  # Arquivo modificado
